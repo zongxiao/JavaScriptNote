@@ -79,11 +79,9 @@ yarn-error.log*
    // 远程仓库创建完成后，进行关联
    git remote add origin [url]
    
-   // 关联后，切换到远程的分支
-   git checkout main
+   // 关联后，切换到远程的主分支 
+   git checkout master
    ```
-
-    现在新建的主分支改为main，不是master 
 
 2. #####  克隆一个远程的仓库 
 
@@ -92,4 +90,3 @@ yarn-error.log*
    ```
 
    
-
