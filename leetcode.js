@@ -270,30 +270,24 @@
 // 给你两个字符串 haystack 和 needle ，请你在 haystack 字符串中找出 needle 字符串出现的第一个位置（下标从 0 开始）。如果不存在，则返回  -1 。
 // 当 needle 是空字符串时我们应当返回 0 
 {
-    // 输入：haystack = "hello", needle = "he"
+    // 实现 indexOf()
+    // 输入：haystack = "hello", needle = "ll"
     // 输出：2
-    // h e l l o  i = 
-    // l l
     var indexOf = function(haystack, needle) {
-        let haystackLength = haystack.length;
-        let needleLen = needle.length;
-        if (needleLen > haystackLength) return -1;
-        if (haystackLength === 0 || needleLen === 0) return 0;
+        if (haystack.length < needle.length) return -1;
+        if (haystack.length === 0 || needle.length === 0) return 0;
         let i = 0, j = 0;
-        while(i < haystackLength && j < needleLen) {
+        while(i < haystack.length && j < needle.length) {
             if (haystack[i] === needle[j]) {
                 i++;
                 j++;
             } else {
-                i = i - j + 1;
+                i = i - j + 1; // 就是减去那些被匹配前j个，但是不完全匹配的 然后+1进入下一个字符
                 j = 0;
             }
         }
-        if (j === needleLen) return (i - j);
+        if (j === needle.length) return (i - j);
         return -1;
     };
-
-    console.log( indexOf("hello", "ll") );
+    console.log(indexOf("mississippi", "issip"));
 }
-
-console.log("hello".indexOf("hea"));
