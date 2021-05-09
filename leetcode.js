@@ -291,3 +291,26 @@
     };
     console.log(indexOf("mississippi", "issip"));
 }
+
+// 2021-05-09
+// 斐波那契数列
+// 斐波那契数列由 0 和 1 开始，之后的斐波那契数就是由之前的两数相加而得出。
+// 答案需要取模 1e9+7（1000000007），如计算初始结果为：1000000008，请返回 1。
+{   
+    var fib = function(n) {
+
+        if (n <= 1) return n;
+        let a = 0;
+        let b = 1;
+
+        for (let i = 2; i <= n; i++) {
+            let c = a + b;
+            a = b;
+            b = c % 1000000007;
+        }
+
+        return b;
+    };
+
+    console.log( fib(5) ); // 5
+}
