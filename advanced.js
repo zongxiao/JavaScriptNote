@@ -319,6 +319,7 @@
     // 为 age 添加一个 getter 来解决这个问题：
     {
         function User(name, birthday) {
+            // this = {} 隐式生成this
             this.name = name;
             this.birthday = birthday;
             Object.defineProperty(this, 'age', {
@@ -333,7 +334,6 @@
 }
 
 {
-    console.log("");
     console.log("--------------------------------------原型继承");
     // 我们有一个 user 对象及其属性和方法，并希望将 admin 和 guest 作为基于 user 稍加修改的变体。
     // 我们想重用 user 中的内容，而不是复制/重新实现它的方法，而只是在其之上构建一个新的对象。
@@ -663,3 +663,5 @@
         console.log(blackRabbit); // Rabbit { name: 'black' }
     }
 }
+
+// -------------------------------以上复习于2021年5月10日---------------------------------------------------

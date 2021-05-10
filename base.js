@@ -2322,19 +2322,19 @@ console.log("--------------递归和堆栈-----------------");
         // 但如果服务器过载了，那么就要降低请求频率，一旦请求成功，立马重新2秒一个请求
         // let delay = 2000;
 
-        // let timeid = setTimeout( function request() {
-        //     console.log('request...')
+        let timeid = setTimeout( function request() {
+            console.log('request...')
 
-        //     if (Math.round(Math.random())) {
-        //         console.log('请求成功')
-        //         delay = 2000;
-        //     } else {
-        //         console.log('请求失败')
-        //         delay += 2000;
-        //     }
+            if (Math.round(Math.random())) {
+                console.log('请求成功')
+                delay = 2000;
+            } else {
+                console.log('请求失败')
+                delay += 2000;
+            }
 
-        //     timeid = setTimeout(request, delay);
-        // }, delay);
+            timeid = setTimeout(request, delay);
+        }, delay);
     }
 
     {
@@ -2387,7 +2387,7 @@ console.log("--------------递归和堆栈-----------------");
 
         console.log( slow(2) ); // 1286ms之后打印传入参数2
         console.log( slow(2) ); // 1286ms之后打印传入参数2，重复计算浪费时间
-        // 执行了五次，每次都需要经历重灾难运算
+        // 执行了2次，每次都需要经历重灾难运算
 
         // 可以创建一个包装器（wrapper）函数，该函数增加了缓存功能。
         function cachingDecorator(func) {
