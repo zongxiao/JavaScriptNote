@@ -337,9 +337,42 @@
     // 后序遍历是先遍历左子树，然后遍历右子树，最后访问树的根节点。
 
 {
-    var preorderTraversal = function(root) {
-        return root ? [root.val, ...preorderTraversal(root.left), ...preorderTraversal(root.right)] : [];
-    };
+    // 递归实现二叉树前序遍历，前序：根 左子树 右子树
 
-    console.log( preorderTraversal( [1,null, 2, 3]) );
+    // @param {TreeNode} root
+    // @return {number[]}
+
+    var preorderTraversal = function(root) {
+        const res = [];
+        const func = (root) => {
+            if (root === null) return ;
+            res.push(root.val);
+            func(root.left);
+            func(root.right);
+        }
+        func(root);
+        return res;
+    };
+}
+
+{
+    // 迭代实现前序遍历，前序：根 左子树 右子树
+    // 采用进栈出栈来遍历，先进栈后出栈
+    
+    // @param {TreeNode} root
+    // @return {number[]}
+    var preorderTraversal = function(root) {
+        const stack = [];
+        const res = [];
+        if (root) stack.push(root);
+        while (stack.length) {
+            // 栈里有元素，先出栈，并且获得当前出栈的值push进res
+            let curRoot = stack.pop();
+            res.push(curRoot.val); // 访问当前根的值
+            // 先进后出，所以要先遍历左再遍历右，就要右子树先进栈，左子树后进栈
+            if (curRoot.right) stack.push(curRoot.right);
+            if (curRoot.left) stack.push(curRoot.left);
+        }
+        return res;
+    };
 }

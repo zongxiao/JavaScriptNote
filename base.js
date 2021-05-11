@@ -2209,6 +2209,14 @@ console.log("--------------递归和堆栈-----------------");
     }
 }
 // -----------------------------------上面代码复习于2021年4月14日--------------------------------------------
+
+
+
+
+
+
+
+// -----------------------------------下面代码复习于2021年5月11日--------------------------------------------
 {
     // "new Function" 语法
     console.log(`"new Function" 语法`);
@@ -2440,6 +2448,19 @@ console.log("--------------递归和堆栈-----------------");
         console.log(worker.slow(2,9)); // 参数2,9首次调用，没有缓存记录，耗时
         console.log(worker.slow(2,9)); // 参数2,9再次调用，调用缓存记录，不耗时
         console.log(worker.slow(2,5)); // 参数2,5首次调用，没有缓存记录，耗时
+        // 注意难理解的点，经过包装函数处理，此时worker.slow等于一个函数
+        {
+            worker.slow = function() {
+                let key = hash(arguments);
+                if (cache.has(key)) {
+                    return cache.get(key);
+                }
+                let result = func.apply(this, arguments);
+                cache.set(key, result);
+                return result;
+            }
+        }
+        //  其中，func.apply(this, arguments)里面的this值得是func函数运行的上下文，也就是调用slow的worker
     }
 
     // 通用的 呼叫转移（call forwarding） 通常是使用 apply 完成的：
@@ -2505,6 +2526,8 @@ console.log("--------------递归和堆栈-----------------");
                 clearTimeout(timeid)
                 timeid = setTimeout(() => {
                     func.apply(this, arguments);
+                    // 也可替换为下面的两种
+                    // func.call(this, ...arguments);
                 }, ms)
             }
         }
@@ -2552,6 +2575,32 @@ console.log("--------------递归和堆栈-----------------");
     };  // 方法一，箭头函数有10ms的延迟，迅速改掉原来对象，定时器调用了更改后的对象
     // 但是方法2:bind，绑定了user的上下文之后，不会因为更改对象而调用更改后的对象
 
+    {
+        let worker = {
+            y: 2,
+            slow (x, z) {
+                console.log(x * z * this.y);
+            },
+        }
+    
+        worker.slow(3, 4); // 立马输出
+    
+        //创建一个函数包装之后延时输出
+        function debounce(f, ms) {
+            let timeid = null;
+            return function() {
+                clearTimeout(timeid);
+                timeid = setTimeout(() => {
+                    // f.apply(worker, arguments);
+                    f.bind(worker)(...Array.from(arguments))
+                }, ms);
+            }
+        }
+        worker.slow = debounce(worker.slow, 1000);
+        worker.slow(1, 2); // 4
+        worker.slow(2, 2); // 8
+        worker.slow(2, 5); // 8
+    }
 
     // 如果一个对象有很多方法，并且我们都打算将它们都传递出去，那么我们可以在一个循环中完成所有方法的绑定：
     {
