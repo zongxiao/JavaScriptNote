@@ -376,3 +376,23 @@
         return res;
     };
 }
+
+
+{
+    // 递归实现二叉树中序遍历，中序：左子树 根节点 右子树
+
+    // @param {TreeNode} root
+    // @return {number[]}
+
+    var inorderTraversal = function(root) {
+        const res = [];
+        const traversal = function(root) {
+            if (!root) return ;
+            if (root.left) traversal(root.left);
+            res.push(root.val);
+            if (root.right) traversal(root.right);
+        }
+        traversal(root);
+        return res;
+    };
+}

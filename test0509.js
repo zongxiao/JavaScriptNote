@@ -25,3 +25,22 @@
     worker.slow(1, 2); // 不输出
     worker.slow(2, 5); // 20
 }
+
+
+
+{
+    let objnew = {}
+    let obj = {
+        'red': 'hongse',
+        'yellow': 'huansge',
+        'id': '1212121212',
+        'parentId': '222'
+    };
+    
+    Object.keys(obj).filter(item => {
+        if (item.toLocaleLowerCase().indexOf('id') === -1) return true;
+    }).map(item => objnew[item] = obj[item]);
+
+    console.log(objnew);
+    // { red: 'hongse', yellow: 'huansge' }
+}
