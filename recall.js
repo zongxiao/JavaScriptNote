@@ -120,15 +120,16 @@
     Object.defineProperty(person, 'age', {
         value: 30,
         writable: true,
-        enumerable: false,
-        configurable: false
+        enumerable: true,
+        configurable: true
     });
-    console.log(person);
-    // 浅拷贝
-    let clone = Object.assign({}, Object.getOwnPropertyDescriptors(person));
-    console.log(clone);
     
-    // 深拷贝 递归
+    // 浅拷贝
+    // let clone = Object.assign({}, person);
+    let clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(person));
+    console.log(clone.child === person.child); // true
+    
+    // 深拷贝 递归法
     function deepCopy(sourceObj) {
         let cloneObj = Array.isArray(sourceObj) ? [] : {};
 
@@ -143,7 +144,10 @@
     }
 
     let deepCloneObj = deepCopy(person);
-    person.child = [];
-    console.log(deepCloneObj);
+    console.log(deepCloneObj.child === person.child); // false
 
+    // 深拷贝 JSON.stringfy()字符串化，再用JSON.parse()对象化
+    let deepCloneObj2 = JSON.parse(JSON.stringify(person, null, 2));
+    console.log(deepCloneObj.child === person.child);
+    console.log(deepCloneObj2);
 }
