@@ -233,12 +233,100 @@
 
 {
     // 对象属性值求和
+    let slaries = {
+        John: 3000,
+        Mary: 4500,
+        Bol: 6000
+    };
+    // 利用Object.entries()获取键值集合的集合
+    let sum = Object.entries(slaries).reduce((prev, [key, value]) => {
+        return prev + value;
+    }, 0);
+    console.log(sum);
+
+    // 利用Object.values()获取对象的value的集合
+    let sum2 = Object.values(slaries).reduce((prev, item) => {
+        return prev + item
+    }, 0);
+    console.log(sum2);
 }
 
 {
-    // Date简例
+    // Date简例 返回距离明天还有多久
+    function getTomorrowSeconds() {
+        let now = new Date();
+        let end = new Date();
+        end.setDate(now.getDate() + 1);
+        end.setHours(0);
+        end.setMinutes(0);
+        end.setSeconds(0);
+        let reduceSeconds = (end - now) / 1000;
+        return reduceSeconds;
+    }
+    console.log( getTomorrowSeconds() + 's');
+
 }
 
 {
     // JSON简例
+    let room = {
+        number: 23
+    };
+    let meetup = {
+        title: 'oc',
+        ocupy: [
+            { name: 'jogn' },
+            { name: 'hhh' }
+        ],
+        place: room
+    };
+    // 循环引用
+    room.ocupy = meetup;
+    meetup.self = meetup;
+    console.log( JSON.stringify(meetup, function (key, value) {
+        console.log(value);
+        if (key != "" && value === meetup) {
+            return undefined;
+        } else {
+            return value;
+        }
+    }, 0) );
+}
+{
+    // 递归遍历对象
+}
+
+{
+    // 斐波那契数列
+}
+{
+    // 展开符
+}
+
+{
+    // 作用域闭包
+}
+
+{
+    // 函数对象属性设置
+}
+
+{
+    // 调度setTimeout
+}
+
+{
+    // 缓存包装器
+}
+
+{
+    // 多参数缓存器
+}
+
+{
+    // 防抖装饰器
+}
+
+{
+    // 绑定上下文
 }
