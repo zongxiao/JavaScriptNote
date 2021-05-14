@@ -153,15 +153,82 @@
 }
 
 {
-    // WeakMap()简例
+    // Map()简例
+    let visitCountMap = new Map();
+    function addCount(user) {
+        let currentCount = visitCountMap.get(user) || 0;
+        visitCountMap.set(user, ++currentCount);
+    }
+    let userSilence37 = { name: 'lzx', age: 26 };
+    // 此时userSilence37访问了我的站点2次
+    addCount(userSilence37);
+    addCount(userSilence37);
+    console.log(visitCountMap.get(userSilence37)); // 2
+    // userSilence37 注销了账号
+    userSilence37 = null;
+    console.log(visitCountMap);
+    // Map { { name: 'lzx', age: 26 } => 2 }
+    // 即使注销了账号 但是map里面的数据还在
+
+
+    // WeakMap() 简例
+    let visitCountWeakMap = new WeakMap();
+    function addWeakCount(user) {
+        let currentCount = visitCountWeakMap.get(user) || 0;
+        visitCountWeakMap.set(user, ++currentCount);
+    }
+    let userBaby = { name: 'zxy', age: 20 };
+    // 此时userBaby访问了1次
+    addWeakCount(userBaby);
+    console.log(visitCountWeakMap.get(userBaby)); // 1
+    // userBaby 注销了账号
+    userBaby = null;
+    console.log(visitCountWeakMap); 
+    // WeakMap { <items unknown> }
+    // 内存中已经彻底没有了userBaby
 }
 
 {
-    // WeakSet() 简例
+    // new Set()简例
+    let visitSet = new Set();
+    let Silence = { name: 'lzx' };
+    let Baby = { name: 'zxy' };
+    // 此时Silence访问了2次，Baby访问了一次
+    visitSet.add(Silence);
+    visitSet.add(Silence);
+    visitSet.add(Baby);
+    Silence = Baby = null; // 注销账号
+    console.log(visitSet);
+    // Set { { name: 'lzx' }, { name: 'zxy' } }
+    // 注销的账号信息还存放在内存中
+
+    // new WeakSet()
+    let visitWeakSet = new WeakSet();
+    let userLuo = { name: 'luo' };
+    let userZhang = { name: 'zhang'};
+    visitWeakSet.add(userLuo);
+    visitWeakSet.add(userZhang);
+    userLuo = userZhang = null;
+    console.log(visitWeakSet);
+    // WeakSet { <items unknown> }
 }
 
 {
-    // 对象使用数组的方法
+    // 对象使用数组的方法对价格进行加倍
+
+    // 水果的价格
+    let fruitsPrice = {
+        banana: 3,
+        apple: 5,
+        peach: 4
+    };
+    // 翻倍後水果的价格
+    let doubleFruits = Object.fromEntries(
+        Object.entries(fruitsPrice).map(([key, value]) => {
+            return [key, value * 2];
+        })
+    );
+    console.log(doubleFruits);
 }
 
 {
