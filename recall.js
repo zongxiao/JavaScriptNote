@@ -125,11 +125,11 @@
     });
     
     // 浅拷贝
-    // let clone = Object.assign({}, person);
-    let clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(person));
+    // let clone = Object.defineProperties({}, Object.getOwnPropertyDescriptors(person));
+    let clone = Object.assign({}, person);
     console.log(clone.child === person.child); // true
-    
-    // 深拷贝 递归法
+
+    // 深拷贝 递归
     function deepCopy(sourceObj) {
         let cloneObj = Array.isArray(sourceObj) ? [] : {};
 
@@ -144,10 +144,34 @@
     }
 
     let deepCloneObj = deepCopy(person);
-    console.log(deepCloneObj.child === person.child); // false
+    console.log(deepCloneObj);
 
     // 深拷贝 JSON.stringfy()字符串化，再用JSON.parse()对象化
     let deepCloneObj2 = JSON.parse(JSON.stringify(person, null, 2));
     console.log(deepCloneObj.child === person.child);
     console.log(deepCloneObj2);
+}
+
+{
+    // WeakMap()简例
+}
+
+{
+    // WeakSet() 简例
+}
+
+{
+    // 对象使用数组的方法
+}
+
+{
+    // 对象属性值求和
+}
+
+{
+    // Date简例
+}
+
+{
+    // JSON简例
 }
