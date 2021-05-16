@@ -442,9 +442,18 @@
 
     function wrapper (func) {
         let cache = new Map();
+        return function (x) {
+            if (cache.has(x)) {
+                return cache.get(x);
+            }
+            let result = func.call(this, x);
+            cache.set(x, result);
+            return result;
+        }
     }
-
-
+    worker.slow = wrapper(worker.slow);
+    // console.log( worker.slow(5) );
+    // console.log( worker.slow(5) );
 }
 
 {
@@ -457,4 +466,8 @@
 
 {
     // 绑定上下文
+}
+
+{
+    // $(".y-item td:nth-child(2)").text()
 }
