@@ -431,14 +431,14 @@
     let worker = {
         x: 2,
         slow (a) {
-            for (let i = 0; i < 1000000000; i++) {
+            for (let i = 0; i < 100000; i++) {
                 a = a + this.x;
             }
             return a;
         }
     }
-    console.log( worker.slow(4) );
-    console.log( worker.slow(4) );
+    // console.log( worker.slow(4) );
+    // console.log( worker.slow(4) );
 
     function wrapper (func) {
         let cache = new Map();
@@ -454,20 +454,107 @@
     worker.slow = wrapper(worker.slow);
     // console.log( worker.slow(5) );
     // console.log( worker.slow(5) );
+    // console.log( worker.slow(3) );
 }
 
 {
     // 多参数缓存器
+    let worker = {
+        x: 2,
+        slow (a, b) {
+            for (let i = 0; i < 1000; i++) {
+                a = a + b + this.x;
+            }
+            return a;
+        }
+    }
+    function hash(args) {
+        return Array.prototype.join.call(args, "&");
+    }
+    function wrapper(func, hash) {
+        let cache = new Map();
+        return function() {
+            let key = hash(arguments);
+            if (cache.has(key)) {
+                return cache.get(key);
+            }
+            let result = func.apply(this, arguments);
+            cache.set(key, result);
+            return result;
+        }
+    }
+    worker.slow = wrapper(worker.slow, hash);
+    console.log(worker.slow(2, 3));
+    // 已经缓存记录，无需重新调用耗时的函数
+    console.log(worker.slow(2, 3));
+    console.log(worker.slow(4, 2));
 }
 
 {
     // 防抖装饰器
+    let people = {
+        name: 'lzx',
+        writing(value) {
+            console.log(`${value} by ${this.name}`);
+        }
+    }
+    function debounce(func, ms) {
+        let timeid = null;
+        function wrapper() {
+            clearTimeout(timeid);
+            timeid = setTimeout(() => {
+                func.apply(this, arguments);
+            }, ms);
+        }
+        return wrapper;
+    }
+    people.writing = debounce(people.writing, 200);
+    setTimeout(() => people.writing(12), 0);
+    setTimeout(() => people.writing(1234), 300);
+    setTimeout(() => people.writing(12345), 400);
 }
 
 {
     // 绑定上下文
+    let user = {
+        name: 'lzx'
+    };
+
+    function sayName(x) {
+        console.log(this.name + x);
+    }
+
+    let g = sayName.bind(user, "+");
+    g(); // lzx+
+    
 }
 
 {
+    // aliyun阿里云
     // $(".y-item td:nth-child(2)").text()
+}
+
+{
+    // F.prototype为构造函数设置原型
+    function Rabbit(color) {
+        this.color = color;
+    }
+
+    Rabbit.prototype = {
+        constructor: Rabbit,
+        jump: true
+    };
+
+    let redRabbit = new Rabbit('red');
+    console.log(redRabbit.jump);
+
+    let whiteRabbit = new redRabbit.constructor('white');
+    console.log(whiteRabbit.jump);
+
+    for (const key in whiteRabbit) {
+        console.log(key,whiteRabbit[key]);
+        if (Object.hasOwnProperty.call(whiteRabbit, key)) {
+            console.log(key,whiteRabbit[key]);
+        }
+    }
 }
