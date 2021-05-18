@@ -665,3 +665,47 @@
 }
 
 // -------------------------------以上复习于2021年5月10日---------------------------------------------------
+{
+    function Group(name) {
+        this.groupname = name;
+        this.objective = name;
+    }
+    Group.prototype.objective = 'chat';
+    let readBookGroup = new Group('readBook');
+    // after a periods of time
+    readBookGroup.objective = Group.prototype.objective;
+    console.log(readBookGroup); // Group { groupname: 'readBook', objective: 'chat' }
+}
+
+{
+    // 原生的原型
+    console.log("------------原生的原型------------------------")
+    {
+        // Object 就是一个内建的对象构造函数，其自身的 prototype 指向一个带有 toString 和其他方法的一个巨大的对象。
+        let obj = new Object();
+        console.log(obj.__proto__ === Object.prototype); // true
+        console.log(obj.toString === obj.__proto__.toString); // true
+        console.log(obj.toString === Object.prototype.toString); // true
+
+        // 请注意在 Object.prototype 上方的链中没有更多的 [[Prototype]]
+        console.log(Object.prototype.__proto__); // null
+    }
+    // 其他内建原型
+    // 其他内建对象，像 Array、Date、Function 及其他，都在 prototype 上挂载了方法。
+    // 例如，当我们创建一个数组 [1, 2, 3]，在内部会默认使用 new Array() 构造器。因此 Array.prototype 变成了这个数组的 prototype，并为这个数组提供数组的操作方法。这样内存的存储效率是很高的。
+    // 所有的内建原型顶端都是 Object.prototype。这就是为什么有人说“一切都从对象继承而来”。
+    {
+        let arr = [1, 2, 3];
+        // 它继承自 Array.prototype？
+        console.log( arr.__proto__ === Array.prototype ); // true
+        
+        // 接下来继承自 Object.prototype？
+        console.log( arr.__proto__.__proto__ === Object.prototype ); // true
+        
+        // 原型链的顶端为 null。
+        console.log( arr.__proto__.__proto__.__proto__ ); // null
+    }
+
+    // 一些方法在原型上可能会发生重叠，例如，Array.prototype 有自己的 toString 方法来列举出来数组的所有元素并用逗号分隔每一个元素。
+
+}

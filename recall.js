@@ -509,9 +509,9 @@
         return wrapper;
     }
     people.writing = debounce(people.writing, 200);
-    setTimeout(() => people.writing(12), 0);
-    setTimeout(() => people.writing(1234), 300);
-    setTimeout(() => people.writing(12345), 400);
+    // setTimeout(() => people.writing(12), 0);
+    // setTimeout(() => people.writing(1234), 300);
+    // setTimeout(() => people.writing(12345), 400);
 }
 
 {
@@ -532,6 +532,24 @@
 {
     // aliyun阿里云
     // $(".y-item td:nth-child(2)").text()
+}
+
+{
+    let hamster = {
+        stomach: [],
+        eat(food) {
+            this.stomach += food;
+        }
+    };
+    let rabbit = {
+        __proto__: hamster
+    };
+    let sheep = {
+        __proto__: hamster
+    }
+    rabbit.eat('apple');
+    sheep.eat('grass');
+    console.log(rabbit);
 }
 
 {
