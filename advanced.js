@@ -707,5 +707,120 @@
     }
 
     // 一些方法在原型上可能会发生重叠，例如，Array.prototype 有自己的 toString 方法来列举出来数组的所有元素并用逗号分隔每一个元素。
+    {
+        
+        let arr = [1, 2, 3];
+        console.log(arr.toString()); // 1,2,3
+        Array.prototype.toString = Object.prototype.toString; // 将对象原型上的toString方法 赋值给 数组原型上的toString
+        console.log(arr.toString()); // [object Array]
+        let obj = {
+            '1': 1,
+            'name': 'lzx'
+        };
+        console.log(obj.toString()); // [object Object]
+    }
 
+    // 其他内建对象也以同样的方式运行。即使是函数 —— 它们是内建构造器 Function 的对象，并且它们的方法（call/apply 及其他）都取自 Function.prototype。函数也有自己的 toString 方法。
+    {
+        function f() {}
+        console.log(f.__proto__ === Function.prototype); // true
+        console.log(f.__proto__.__proto__ === Object.prototype); // true
+        console.log(f.toString()); // function f() {}
+        Function.prototype.toString = Object.prototype.toString;
+        console.log(f.toString()); // [object Function]
+    }
+
+
+    // 基本数据类型 最复杂的事情发生在字符串、数字和布尔值上。
+    // 正如我们记忆中的那样，它们并不是对象。但是如果我们试图访问它们的属性，那么临时包装器对象将会通过内建的构造器 String、Number 和 Boolean 被创建。它们提供给我们操作字符串、数字和布尔值的方法然后消失。
+    {
+        let str = "123";
+        console.log(str.toString());
+        String.prototype.toString = function(value) {
+            return value + 1;
+        };
+        console.log(str.toString(str)); // 1231
+    }
+
+    // 值 null 和 undefined 没有对象包装器
+    // 特殊值 null 和 undefined 比较特殊。它们没有对象包装器，所以它们没有方法和属性。并且它们也没有相应的原型。\
+
+    // 更改原生原型
+    {
+        // 我们向 String.prototype 中添加一个方法，这个方法将对所有的字符串都是可用的：
+        String.prototype.show = function() {
+            console.log(this);
+        }
+        "123".show(); // [String: '123']
+    }
+
+    // 原型是全局的，所以很容易造成冲突。如果有两个库都添加了 String.prototype.show 方法，那么其中的一个方法将被另一个覆盖。
+    // 通常来说，修改原生原型被认为是一个很不好的想法。
+
+    // 在现代编程中，只有一种情况下允许修改原生原型。那就是 polyfilling。
+    // Polyfilling 是一个术语，表示某个方法在 JavaScript 规范中已存在，但是特定的 JavaScript 引擎尚不支持该方法，那么我们可以通过手动实现它，并用以填充内建原型。
+    {
+        if (!String.prototype.repeat) {
+            String.prototype.repeat = function(n) {
+                return [].join(this);
+            }
+        }
+        console.log("la".repeat(3)); // lalala
+    }
+
+    // 从原型中借用: 指我们从一个对象获取一个方法，并将其复制到另一个对象。
+    {
+        let obj = {
+            0: 'hello',
+            1: 'world',
+            length: 2
+        };
+        obj.join = Array.prototype.join;
+        console.log(obj.join('-')); // hello-world
+        // 内建的方法 join 的内部算法只关心正确的索引和 length 属性。它不会检查这个对象是否是真正的数组。许多内建方法就是这样。
+    }
+    // 另一种方式是通过将 obj.__proto__ 设置为 Array.prototype，这样 Array 中的所有方法都自动地可以在 obj 中使用了。
+    {
+        let obj2 = {
+            0: 'hello',
+            1: 'world',
+            length: 2
+        };
+        obj2.__proto__ = Array.prototype;
+        console.log(obj2.reverse()); // Array { '0': 'world', '1': 'hello', length: 2 }
+    }
+    // 请记住，我们一次只能继承一个对象。
+
+    // 案例
+
+    // 给函数添加一个 "f.defer(ms)" 方法
+    {
+        function f() {
+            console.log('hello!');
+        }
+        if (!Function.prototype.defer) {
+            Function.prototype.defer = function(ms) {
+                setTimeout(() => {
+                    this();
+                }, ms);
+            }
+        }
+        f.defer(1000); // 1 秒后显示 "Hello!"
+    }
+
+    // 将装饰器 "defer()" 添加到函数
+    // 在所有函数的原型中添加 defer(ms) 方法，该方法返回一个包装器，将函数调用延迟 ms 毫秒。
+    {
+        function f(a, b) {
+            console.log(a + b);
+        }
+        Function.prototype.defer = function(ms) {
+            return (...args) => {
+                setTimeout(() => {
+                    this.apply(this, args);
+                }, ms);
+            }
+        }
+        f.defer(1000)(1,3);
+    }
 }
