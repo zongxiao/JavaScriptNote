@@ -762,7 +762,7 @@
     {
         if (!String.prototype.repeat) {
             String.prototype.repeat = function(n) {
-                return [].join(this);
+                return new Array(n + 1).join(this);
             }
         }
         console.log("la".repeat(3)); // lalala
@@ -805,22 +805,153 @@
                 }, ms);
             }
         }
-        f.defer(1000); // 1 秒后显示 "Hello!"
+        //f.defer(1000); // 1 秒后显示 "Hello!"
     }
 
     // 将装饰器 "defer()" 添加到函数
     // 在所有函数的原型中添加 defer(ms) 方法，该方法返回一个包装器，将函数调用延迟 ms 毫秒。
     {
-        function f(a, b) {
-            console.log(a + b);
+        let obj = {
+            x: 1,
+            f(a, b, c) {
+                return a + b + c + this.x;
+            }
         }
         Function.prototype.defer = function(ms) {
             return (...args) => {
                 setTimeout(() => {
-                    this.apply(this, args);
+                    // console.log(this.apply(obj, args));
+                    console.log( this(...args) );
                 }, ms);
             }
         }
-        f.defer(1000)(1,3);
+        //obj.f.bind(obj).defer(1000)(1,3,5); // after 1000ms output 10
+
+        function fib(n) {
+            if (n <= 2) {
+                return n;
+            } else {
+                return fib(n - 1) + fib(n - 2);
+            }
+        }
+        //fib.defer(1000)(5); // after 1000ms output 8
+    }
+}
+
+{
+    console.log('-------------原型方法，没有 __proto__ 的对象------------------');
+    // __proto__ 被认为是过时且不推荐使用的（deprecated），这里的不推荐使用是指 JavaScript 规范中规定，proto 必须仅在浏览器环境下才能得到支持。
+    
+    // Object.create(proto, [descriptors])   利用给定的proto 作为[[prototype]] 和可选的属性描述来创建一个空对象。
+
+    // Object.getPrototypeOf(obj)  返回对象 obj 的 [[Prototype]]
+    // Object.setPrototypeOf(obj, proto)  将对象 obj 的 [[Prototype]] 设置为 proto。
+    {
+        let animal = {
+            eats: true
+        };
+
+        // 创建对象，并将animal设置为新创建对象的[[prototype]]，并且给新对象添加name属性
+        let rabbit = Object.create(animal, {
+            'name': {
+                value: 'rabbit',
+                enumerable: true,
+                writable: true,
+            },
+        });
+
+        console.log(rabbit.eats); // true
+        for (const key in rabbit) {
+            console.log(key, rabbit[key]);
+            // name rabbit
+            // eats true
+        }
+
+        // 返回对象 rabbit 的 [[Prototype]]
+        console.log(Object.getPrototypeOf(rabbit) === animal); // true
+
+        let pig = {};
+        Object.setPrototypeOf(pig, animal);
+        console.log(pig.eats); // true
+    }
+
+    // 我们可以使用 Object.create 来实现比复制 for..in 循环中的属性更强大的对象克隆方式：
+    {
+        let animal = {
+            eat: true,
+            sleep: true,
+            running() {
+                console.log('animals is running');
+            }
+        };
+
+        let rabbit = Object.create(animal, {
+            'name': {
+                value: 'rabbit',
+                writable: true,
+                enumerable: true,
+                configurable: true
+            },
+            'color': {
+                value: 'white',
+                enumerable: true,
+                writable: true
+            }
+        });
+        let cloneRabbit = Object.create(Object.getPrototypeOf(rabbit), Object.getOwnPropertyDescriptors(rabbit));
+
+        for (const key in cloneRabbit) {
+            console.log(key, cloneRabbit[key]);
+        }
+        // name rabbit
+        // color white
+        // eat true
+        // sleep true
+        // running [Function: running]
+
+        // 此调用可以对 obj 进行真正准确地拷贝，包括所有的属性：可枚举和不可枚举的，
+        // 数据属性和 setters/getters —— 包括所有内容，并带有正确的 [[Prototype]]。
+    }
+
+    {
+        // 创建一个没有原型（[[Prototype]] 是 null）：
+        let obj = Object.create(null);
+        // console.log(obj.toString()); // obj.toString is not a function
+
+        let obj2 = Object.create(Object);
+        console.log(obj2.toString()); // [object Object]
+    }
+
+    // 其他方法：
+
+    // Object.keys(obj) / Object.values(obj) / Object.entries(obj) —— 返回一个可枚举的由自身的字符串属性名/值/键值对组成的数组。
+    // Object.getOwnPropertySymbols(obj) —— 返回一个由自身所有的 symbol 类型的键组成的数组。
+    // Object.getOwnPropertyNames(obj) —— 返回一个由自身所有的字符串键组成的数组。
+    // Reflect.ownKeys(obj) —— 返回一个由自身所有键组成的数组。
+    // obj.hasOwnProperty(key)：如果 obj 拥有名为 key 的自身的属性（非继承而来的），则返回 true。
+
+    {
+        // 为 dictionary 添加 toString 方法
+        console.log('-------------------------------')
+        let dictionary = Object.create(null);
+
+        // 你的添加 dictionary.toString 方法的代码
+        Object.defineProperty(dictionary, 'toString', {
+            writable: true
+        })
+        dictionary.toString = function() {
+            return Object.keys(this).join(",");
+        }
+        // 添加一些数据
+        dictionary.apple = "Apple";
+        dictionary.__proto__ = "test"; // 这里 __proto__ 是一个常规的属性键
+
+        // 在循环中只有 apple 和 __proto__
+        for(let key in dictionary) {
+            console.log(key); // "apple", then "__proto__"
+        }
+
+        // 你的 toString 方法在发挥作用
+        console.log(dictionary.toString()); // "apple,__proto__"
     }
 }

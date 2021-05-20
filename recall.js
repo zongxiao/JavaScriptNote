@@ -576,3 +576,48 @@
         }
     }
 }
+
+
+// 给函数添加一个 "f.defer(ms)" 方法
+{
+    function f() {
+        console.log('hello!');
+    }
+    if (!Function.prototype.defer) {
+        Function.prototype.defer = function(ms) {
+            setTimeout(() => {
+                this();
+            }, ms);
+        }
+    }
+    f.defer(1000); // 1 秒后显示 "Hello!"
+}
+
+// 将装饰器 "defer()" 添加到函数
+// 在所有函数的原型中添加 defer(ms) 方法，该方法返回一个包装器，将函数调用延迟 ms 毫秒。
+{
+    let obj = {
+        x: 1,
+        f(a, b, c) {
+            return a + b + c + this.x;
+        }
+    }
+    Function.prototype.defer = function(ms) {
+        return (...args) => {
+            setTimeout(() => {
+                // console.log(this.apply(obj, args));
+                console.log( this(...args) );
+            }, ms);
+        }
+    }
+    obj.f.bind(obj).defer(1000)(1,3,5); // after 1000ms output 10
+
+    function fib(n) {
+        if (n <= 2) {
+            return n;
+        } else {
+            return fib(n - 1) + fib(n - 2);
+        }
+    }
+    fib.defer(1000)(5); // after 1000ms output 8
+}
