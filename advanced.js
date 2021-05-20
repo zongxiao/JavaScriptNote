@@ -933,6 +933,7 @@
     {
         // 为 dictionary 添加 toString 方法
         console.log('-------------------------------')
+        // 创建一个没有原型的对象
         let dictionary = Object.create(null);
 
         // 你的添加 dictionary.toString 方法的代码
