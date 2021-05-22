@@ -956,3 +956,86 @@
         console.log(dictionary.toString()); // "apple,__proto__"
     }
 }
+
+
+// Class 基本语法
+{
+    console.log('-----------Class 基本语法------------');
+    // 在面向对象的编程中，class 是用于创建对象的可扩展的程序代码模版，它为对象提供了状态（成员变量）的初始值和行为（成员函数或方法）的实现。
+
+    // “class” 语法
+    {
+        class MyClass {
+            constructor(name) {
+                this.name = name;
+            }
+            method1() { return 'method 1'; }
+            method2() {}
+            method3() {}
+        }
+        // 然后使用 new MyClass() 来创建具有上述列出的所有方法的新对象。
+        // new 会自动调用 constructor() 方法，因此我们可以在 constructor() 中初始化对象。
+        let user = new MyClass('lzx');
+        console.log(user); // MyClass { name: 'lzx' }
+        console.log(user.method1()); // method 1
+    }
+    // 例子
+    {
+        class User {
+            constructor(name) {
+                this.name = name;
+            }
+
+            sayHi() {
+                console.log(this.name);
+            }
+        }
+
+        let userLzx = new User('lzx');
+        userLzx.sayHi(); // lzx
+    }
+    // 类的方法之间没有逗号
+
+    // 什么是 class？
+    // 在 JavaScript 中，类是一种函数。
+    {
+        class User {
+            constructor(name) {
+                this.name = name;
+            }
+            sayHi() {
+                console.log(this.name);
+            }
+        }
+        let userZxy = new User('Zxy');
+        console.log(typeof User); // function
+        console.log(User === User.prototype.constructor) // true
+        console.log(Object.getOwnPropertyNames(User.prototype)); // [ 'constructor', 'sayHi' ]
+    }
+
+    // class User {...} 构造实际上做了如下的事儿：
+    {
+        // 1.创建一个名为 User 的函数，该函数成为类声明的结果。该函数的代码来自于 constructor 方法（如果我们不编写这种方法，那么它就被假定为空）。
+        // 2.存储类中的方法，例如 User.prototype 中的 sayHi。
+    }
+
+    // 当 new User 对象被创建后，当我们调用其方法时，它会从原型中获取对应的方法，正如我们在 F.prototype 一章中所讲的那样。因此，对象 new User 可以访问类中的方法。
+
+    // 不仅仅是语法糖
+    // 用纯函数重写 class User
+    {
+        function User(name) {
+            this.name = name;
+        }
+
+        User.prototype.sayHi = function() {
+            console.log(this.name);
+        }
+        
+        let user = new User('lzx');
+        user.sayHi(); // lzx
+        console.log(Object.getPrototypeOf(user)); // { sayHi: [Function (anonymous)] }
+    }
+
+
+}
