@@ -542,7 +542,7 @@
         console.log(speedy.stomach); // apple
         // 这只lazy仓鼠也找到了食物
         console.log(lazy.stomach); // pear
-        
+
     }
 }
 
@@ -575,7 +575,7 @@
 
         // F.prototype 仅用在 new F 时
     }
-    
+
     // 默认的 F.prototype，构造器属性
     // 默认的 "prototype" 是一个只有属性 constructor 的对象，属性 constructor 指向函数自身。
     {
@@ -697,18 +697,18 @@
     {
         let arr = [1, 2, 3];
         // 它继承自 Array.prototype？
-        console.log( arr.__proto__ === Array.prototype ); // true
-        
+        console.log(arr.__proto__ === Array.prototype); // true
+
         // 接下来继承自 Object.prototype？
-        console.log( arr.__proto__.__proto__ === Object.prototype ); // true
-        
+        console.log(arr.__proto__.__proto__ === Object.prototype); // true
+
         // 原型链的顶端为 null。
-        console.log( arr.__proto__.__proto__.__proto__ ); // null
+        console.log(arr.__proto__.__proto__.__proto__); // null
     }
 
     // 一些方法在原型上可能会发生重叠，例如，Array.prototype 有自己的 toString 方法来列举出来数组的所有元素并用逗号分隔每一个元素。
     {
-        
+
         let arr = [1, 2, 3];
         console.log(arr.toString()); // 1,2,3
         Array.prototype.toString = Object.prototype.toString; // 将对象原型上的toString方法 赋值给 数组原型上的toString
@@ -722,7 +722,7 @@
 
     // 其他内建对象也以同样的方式运行。即使是函数 —— 它们是内建构造器 Function 的对象，并且它们的方法（call/apply 及其他）都取自 Function.prototype。函数也有自己的 toString 方法。
     {
-        function f() {}
+        function f() { }
         console.log(f.__proto__ === Function.prototype); // true
         console.log(f.__proto__.__proto__ === Object.prototype); // true
         console.log(f.toString()); // function f() {}
@@ -736,7 +736,7 @@
     {
         let str = "123";
         console.log(str.toString());
-        String.prototype.toString = function(value) {
+        String.prototype.toString = function (value) {
             return value + 1;
         };
         console.log(str.toString(str)); // 1231
@@ -748,7 +748,7 @@
     // 更改原生原型
     {
         // 我们向 String.prototype 中添加一个方法，这个方法将对所有的字符串都是可用的：
-        String.prototype.show = function() {
+        String.prototype.show = function () {
             console.log(this);
         }
         "123".show(); // [String: '123']
@@ -761,7 +761,7 @@
     // Polyfilling 是一个术语，表示某个方法在 JavaScript 规范中已存在，但是特定的 JavaScript 引擎尚不支持该方法，那么我们可以通过手动实现它，并用以填充内建原型。
     {
         if (!String.prototype.repeat) {
-            String.prototype.repeat = function(n) {
+            String.prototype.repeat = function (n) {
                 return new Array(n + 1).join(this);
             }
         }
@@ -799,7 +799,7 @@
             console.log('hello!');
         }
         if (!Function.prototype.defer) {
-            Function.prototype.defer = function(ms) {
+            Function.prototype.defer = function (ms) {
                 setTimeout(() => {
                     this();
                 }, ms);
@@ -817,11 +817,11 @@
                 return a + b + c + this.x;
             }
         }
-        Function.prototype.defer = function(ms) {
+        Function.prototype.defer = function (ms) {
             return (...args) => {
                 setTimeout(() => {
                     // console.log(this.apply(obj, args));
-                    console.log( this(...args) );
+                    console.log(this(...args));
                 }, ms);
             }
         }
@@ -841,7 +841,7 @@
 {
     console.log('-------------原型方法，没有 __proto__ 的对象------------------');
     // __proto__ 被认为是过时且不推荐使用的（deprecated），这里的不推荐使用是指 JavaScript 规范中规定，proto 必须仅在浏览器环境下才能得到支持。
-    
+
     // Object.create(proto, [descriptors])   利用给定的proto 作为[[prototype]] 和可选的属性描述来创建一个空对象。
 
     // Object.getPrototypeOf(obj)  返回对象 obj 的 [[Prototype]]
@@ -940,7 +940,7 @@
         Object.defineProperty(dictionary, 'toString', {
             writable: true
         })
-        dictionary.toString = function() {
+        dictionary.toString = function () {
             return Object.keys(this).join(",");
         }
         // 添加一些数据
@@ -948,7 +948,7 @@
         dictionary.__proto__ = "test"; // 这里 __proto__ 是一个常规的属性键
 
         // 在循环中只有 apple 和 __proto__
-        for(let key in dictionary) {
+        for (let key in dictionary) {
             console.log(key); // "apple", then "__proto__"
         }
 
@@ -970,8 +970,8 @@
                 this.name = name;
             }
             method1() { return 'method 1'; }
-            method2() {}
-            method3() {}
+            method2() { }
+            method3() { }
         }
         // 然后使用 new MyClass() 来创建具有上述列出的所有方法的新对象。
         // new 会自动调用 constructor() 方法，因此我们可以在 constructor() 中初始化对象。
@@ -1028,14 +1028,227 @@
             this.name = name;
         }
 
-        User.prototype.sayHi = function() {
+        User.prototype.sayHi = function () {
             console.log(this.name);
         }
-        
+
         let user = new User('lzx');
         user.sayHi(); // lzx
         console.log(Object.getPrototypeOf(user)); // { sayHi: [Function (anonymous)] }
     }
+    // 这个定义的结果与使用类得到的结果基本相同。因此，这确实是将 class 视为一种定义构造器及其原型方法的语法糖的理由。
 
+    // class与普通函数不同，必须使用 new 来调用它 但是typeof 类名 返回的是function
+    {
+        class Animals {
+            constructor() {
+                this.name = 1;
+            }
+        }
+        console.log(typeof Animals); // function
+        console.log(Animals); // [class Animals]
+        let pig = new Animals();
+        console.log(pig); // Animals { name: 1 }
+    }
 
+    // 类方法不可枚举。 类定义将 "prototype" 中的所有方法的 enumerable 标志设置为 false。
+    // 这很好，因为如果我们对一个对象调用 for..in 方法，我们通常不希望 class 方法出现。
+    {
+        class Car {
+            constructor(name) {
+                this.name = name
+            }
+            running(speed) {
+                console.log(`${this.name} is driving at ${speed} km / h`);
+            }
+            stop() {
+                console.log('the car has stoped');
+            }
+        }
+        let bmw = new Car('bmw');
+        console.log(typeof bmw); // object
+        bmw.color = "red";
+        console.log(bmw); // Car { name: 'bmw', color: 'red' }
+
+        // class 方法不会被枚举
+        for (const key in bmw) {
+            console.log(key); // 先输出name、然后输出color
+        }
+
+        bmw.running(120); // bmw is driving at 120 km / h
+
+        // console.log( Object.getOwnPropertyDescriptors(bmw.__proto__) );
+        console.log(Object.getOwnPropertyDescriptors(Car.prototype)); // enumerable都是被设置成false，所以不可枚举！
+
+        // 重新给类的原型定义running方法，定义为可枚举
+        Object.defineProperty(Car.prototype, 'running', {
+            value: function (speed) {
+                console.log(`${this.name} is driving at ${speed - 20} km / h`);
+            },
+            enumerable: true,
+            writable: true,
+            configurable: true
+        });
+
+        for (const key in bmw) {
+            console.log(key); // 依次输出name color running
+        }
+
+        bmw.running(120); // bmw is driving at 100 km / h
+        bmw.stop();
+
+        // 类总是使用 use strict。 在类构造中的所有代码都将自动进入严格模式。
+    }
+
+    // 类表达式
+    // 就像函数一样，类可以在另外一个表达式中被定义，被传递，被返回，被赋值等。
+    {
+        let User = class {
+            sayHi() {
+                console.log('hello');
+            }
+        }
+        new User().sayHi(); // hello
+    }
+
+    // 如果类表达式有名字，那么该名字仅在类内部可见：
+    {
+        let User = class Myclass {
+            sayHi() {
+                console.log('hello');
+            }
+        }
+        new User().sayHi(); // hello
+        // new Myclass().sayHi(); 会报错 所以注释了，类表达式有名字，外部不可见
+    }
+
+    // 我们甚至可以动态地“按需”创建类，就像这样：
+    {
+        function makeClass(phrase) {
+            return class {
+                sayHi() {
+                    console.log(phrase);
+                }
+            }
+        }
+
+        let User = makeClass('hi');
+        new User().sayHi(); // hi
+    }
+
+    // Getters/setters
+    // 就像对象字面量，类可能包括 getters/setters，计算属性（computed properties）等。
+    {
+        // 类限制new的时候，设置name属性输入的字符串长度>4
+
+        class User {
+            constructor(name) {
+                this.name = name;
+            }
+            get name() {
+                return this._name;
+            }
+            set name(value) {
+                if (value.length < 4) {
+                    console.log('name is too short');
+                    return;
+                }
+                this._name = value;
+            }
+        }
+
+        let John = new User('John');
+        console.log(John.name); // John
+
+        let May = new User('May'); // name is too short
+        console.log(May.name); // undefined
+    }
+
+    // 计算属性名称 […]
+    // 这里有一个使用中括号 [...] 的计算方法名称示例：
+    {
+        class User {
+            ['say' + 'Hi']() {
+                console.log('hi');
+            }
+        }
+        new User().sayHi(); // hi
+    }
+
+    // Class 字段（旧的浏览器可能需要 polyfill）
+    // 之前，我们的类仅具有方法。 “类字段”是一种允许添加任何属性的语法。
+
+    // 例如，让我们在 class User 中添加一个 name 属性：我们就只需在表达式中写 " = "，就这样。
+    {
+        class User {
+            name = 'John';
+
+            sayName() {
+                console.log(this.name);
+            }
+        }
+        let user1 = new User();
+        user1.sayName(); // John
+
+        for (const key in user1) {
+            console.log(key); // name  并不是设置在类的 prototype 上了
+        }
+    }
+    // 类字段重要的不同之处在于，它们会在每个独立对象中被设好，而不是设在 User.prototype：
+
+    // 使用类字段制作绑定方法
+    // 正如 函数绑定 一章中所讲的，JavaScript 中的函数具有动态的 this。它取决于调用上下文。
+    // 如果一个对象方法被传递到某处，或者在另一个上下文中被调用，则 this 将不再是对其对象的引用。
+    {
+        class Button {
+            constructor(value) {
+                this.value = value;
+            }
+
+            click() {
+                console.log(this.value);
+            }
+        }
+
+        let button = new Button("hello");
+        console.log(button);
+        // setTimeout(button.click, 1000) // undefined this丢失
+    }
+    // 解决this丢失，可以传递一个包装函数，例如 setTimeout(() => button.click(), 1000)。
+    // 也可以将方法绑定到对象，例如在 constructor 中。
+
+    // 类字段提供了另一种非常优雅的语法：
+    {
+        class Button {
+            constructor(value) {
+                this.value = value;
+            }
+            // 定义类字段 设置为箭头函数
+            click = () => {
+                console.log(this.value);
+            }
+        }
+        let button = new Button('hi');
+        let f = button.click;
+        f(); // hi
+    }
+
+    // 总结
+    {
+        class MyClass {
+            prop = value; // 属性
+
+            constructor() { // 构造器
+                // ...
+            }
+
+            method() { } // method
+
+            get something() { } // getter 方法
+            set something(value) { } // setter 方法
+
+            [Symbol.iterator]() { } // 有计算名称（computed name）的方法（此处为 symbol）
+            // ...
+        }
+    }
 }
