@@ -1251,4 +1251,163 @@
             // ...
         }
     }
+    // 技术上来说，MyClass 是一个函数（我们提供作为 constructor 的那个），而 methods、getters 和 settors 都被写入了 MyClass.prototype。
+
+    // 重写为 class
+    {
+        function Clock({ template }) {
+
+            let timer;
+
+            function render() {
+                let date = new Date();
+
+                let hours = date.getHours();
+                if (hours < 10) hours = '0' + hours;
+
+                let mins = date.getMinutes();
+                if (mins < 10) mins = '0' + mins;
+
+                let secs = date.getSeconds();
+                if (secs < 10) secs = '0' + secs;
+
+                let output = template
+                    .replace('h', hours)
+                    .replace('m', mins)
+                    .replace('s', secs);
+
+                console.log(output);
+            }
+
+            this.stop = function () {
+                clearInterval(timer);
+            };
+
+            this.start = function () {
+                render();
+                timer = setInterval(render, 1000);
+            };
+
+        }
+
+        let clock = new Clock({ template: 'h:m:s' });
+        clock.start();
+        clock.stop()
+    }
+
+    // 构造每隔一秒钟输出时间的类
+    {
+        class Clock {
+            constructor({ template }) {
+                this.template = template
+            }
+            render = () => {
+                let date = new Date();
+                let hours = date.getHours();
+                if (hours < 10) hours = '0' + hours;
+                let mins = date.getMinutes();
+                if (mins < 10) mins = '0' + mins;
+                let secs = date.getSeconds();
+                if (secs < 10) secs = '0' + secs;
+                let output = this.template.replace('h', hours).replace('m', mins).replace('s', secs);
+                console.log(output);
+            }
+            start() {
+                this.render();
+                this.timer = setInterval(this.render, 1000);
+            }
+            stop() {
+                clearInterval(this.timer);
+            }
+        }
+
+        let clock = new Clock({ template: 'h:m:s' });
+        clock.start();
+        setTimeout(() => clock.stop(), 0); // 5秒钟之后停止时钟
+    }
+}
+
+{
+    console.log('----------------类继承--------------------');
+    // 类继承 -- 类继承是一个类扩展另一个类的一种方式。
+    // 因此，我们可以在现有功能之上创建新功能。
+    
+    // “extends” 关键字
+    {
+        class Animals {
+            constructor(name) {
+                this.speed = 0;
+                this.name = name;
+            }
+            run(speed) {
+                this.speed = speed;
+                console.log(`${this.name} runs with speed ${this.speed}.`);
+            }
+            reduceSpeed(speed) {
+                clearTimeout(this.addSpeedTimeid);
+                this.speed -= speed;
+                if (this.speed < 0) {
+                    console.log(`${this.name} stands still.`);
+                } else {
+                    console.log(`${this.name} runs with speed ${this.speed}.`);
+                    this.reduceSpeedTimeid = setTimeout(() => this.reduceSpeed(speed), 1000);
+                }
+            }
+            addSpeed(speed) {
+                clearTimeout(this.reduceSpeedTimeid);
+                this.speed += speed;
+                if (this.speed > 60) {
+                    console.log(`over speed`);
+                } else {
+                    console.log(`${this.name} runs with speed ${this.speed}.`);
+                    this.addSpeedTimeid = setTimeout(() => this.addSpeed(speed), 1000);
+                }
+            }
+        }
+
+        let animal = new Animals('My animal');
+        animal.run(30); // My animal runs with speed 100.
+        // setTimeout(() => animal.reduceSpeed(10), 3000); // 3秒之后开始减速
+        // setTimeout(() => animal.addSpeed(15), 5000); // 5秒之后开始加速
+
+        // 然后我们想创建另一个 class Rabbit：
+        // 因为 rabbits 是 animals，所以 class Rabbit 应该是基于 class Animal 的，可以访问 animal 的方法，以便 rabbits 可以做“一般”动物可以做的事儿。
+
+        // 扩展另一个类的语法是：[ class Child extends Parent ]
+        class Rabbit extends Animals {
+            hide() {
+                console.log(`${this.name} hides!`);
+            }
+        }
+        let rabbit = new Rabbit('White rabbit');
+        rabbit.run(120); // White rabbit runs with speed 120.
+        // setTimeout(() => rabbit.reduceSpeed(10), 3000); // 可以使用父类Animals的方法 3秒之后开始减速
+
+        // Class Rabbit 的对象可以访问例如 rabbit.hide() 等 Rabbit 的方法，还可以访问例如 rabbit.run() 等 Animal 的方法。
+        // 在内部，关键字 extends 使用了很好的旧的原型机制进行工作。
+        // 它将 Rabbit.prototype.[[Prototype]] 设置为 Animal.prototype。
+
+        // 我们可以回忆一下 原生的原型 这一章的内容，JavaScript 内建对象同样也使用原型继承。例如，Date.prototype.[[Prototype]] 是 Object.prototype。这就是为什么日期可以访问通用对象的方法
+        {
+            console.log(Object.getPrototypeOf(Date.prototype) === Object.prototype); // true
+            console.log(typeof Date.prototype, Date.prototype); // object Date {}
+        }
+
+        // 在 extends 后允许任意表达式
+        // 类语法不仅允许指定一个类，在 extends 后可以指定任意表达式。
+        {
+            function f(phrase) {
+                return class {
+                    sayHi() {
+                        console.log(`${phrase}`);
+                    }
+                }
+            }
+            class User extends f('hi') {}
+            new User('lzx').sayHi('hi'); // hi
+        }
+        // 这对于高级编程模式，例如当我们根据许多条件使用函数生成类，并继承它们时来说可能很有用。
+    }
+
+
 }
