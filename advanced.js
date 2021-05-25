@@ -1323,7 +1323,7 @@
 
         let clock = new Clock({ template: 'h:m:s' });
         clock.start();
-        setTimeout(() => clock.stop(), 0); // 5秒钟之后停止时钟
+        setTimeout(() => clock.stop(), 0); // 0秒钟之后停止时钟
     }
 }
 
@@ -1331,7 +1331,7 @@
     console.log('----------------类继承--------------------');
     // 类继承 -- 类继承是一个类扩展另一个类的一种方式。
     // 因此，我们可以在现有功能之上创建新功能。
-    
+
     // “extends” 关键字
     {
         class Animals {
@@ -1403,11 +1403,249 @@
                     }
                 }
             }
-            class User extends f('hi') {}
+            class User extends f('hi') { }
             new User('lzx').sayHi('hi'); // hi
         }
         // 这对于高级编程模式，例如当我们根据许多条件使用函数生成类，并继承它们时来说可能很有用。
     }
 
+
+    // 重写方法
+    // 默认情况下，所有未在 class Rabbit 中指定的方法均从 class Animal 中直接获取。
+    // 但是如果我们在 Rabbit 中指定了我们自己的方法，例如 stop()，那么将会使用它：
+    {
+        class Animals {
+            constructor(name) { console.log(`animals constructor + ${name}`) }
+            stop() {
+                console.log('animals stop');
+            }
+        }
+        class Rabbit extends Animals {
+            stop() {
+                // ……现在这个将会被用作 rabbit.stop()
+                // 而不是来自于 class Animal 的 stop()
+                console.log('rabbit stop');
+            }
+        }
+
+        let whiterabbit = new Rabbit();
+        whiterabbit.stop(); // rabbit stop
+
+        // 我们不希望完全替换父类的方法，而是希望在父类方法的基础上进行调整或扩展其功能。我们在我们的方法中做一些事儿，但是在它之前或之后或在过程中会调用父类方法。
+        // Class 为此提供了 "super" 关键字。
+        // super.method(...) 来调用一个父类方法。
+        // super(...) 来调用一个父类 constructor（只能在我们的 constructor 中）。
+
+        // 例如我们让一只猪利用父类停下来的方法停下来的时候调用自己睡觉的方法
+        class Pig extends Animals {
+            sleep() {
+                console.log('pig is sleeping');
+            }
+            stop() {
+                super.stop();
+                this.sleep();
+            }
+        }
+
+        let pinkPig = new Pig();
+        pinkPig.stop(); // animals stop  然后 pig is sleeping
+        // pinkPig在执行过程中调用父类的 super.stop() 方法，所以 Rabbit 也具有了 stop 方法
+
+        // 箭头函数没有 super （之前学习过箭头函数也没有自己的this，更加没有arguments参数类数组对象）
+
+        {
+            // 错误代码
+            // setTimeout(function() { super.stop() }, 1000);
+        }
+
+        // 下面改为箭头函数就可以避免找不到super
+        class Horse extends Animals {
+            sitting() {
+                console.log('horse is sitting down');
+            }
+            stop() {
+                // setTimeout(() => {
+                //     super.stop();
+                //     this.sitting();
+                // }, 0);
+            }
+        }
+
+        let whiteHorse = new Horse();
+        whiteHorse.stop();
+        // 箭头函数好就好在他没有自己的this 也没有自己的super 没有烦恼
+
+
+        // 重写 constructor
+        // 根据 规范，如果一个类扩展了另一个类并且没有 constructor，那么将生成下面这样的“空” constructor：
+        class Dogs extends Animals {
+            // 没有设置constructor(){}，会默认生成下面的constructor
+            // constructor(...args) {
+            //     super(...args);
+            // }
+        }
+        let blackDog = new Dogs('dog'); // animals constructor + dog
+
+        // !!!! 继承类的 constructor 必须调用 super(...)，并且 (!) 一定要在使用 this 之前调用。
+
+        // 在 JavaScript 中，继承类的构造函数与其他函数之间是有区别的。派生构造器具有特殊的内部属性 [[ConstructorKind]]:"derived"
+        // 会影响它的 new 行为
+        // 1、当通过 new 执行一个常规函数时，它将创建一个空对象，并将这个空对象赋值给 this。
+        // 2、但是当继承的 constructor 执行时，它不会执行此操作。它期望父类的 constructor 来完成这项工作。
+        // 因此 派生的 constructor 必须调用 super 才能执行其父类（base）的 constructor，否则 this 指向的那个对象将不会被创建。并且我们会收到一个报错。
+        class Mouses extends Animals {
+            constructor(name, earLength) {
+                this.name = name;
+                this.earLength = earLength;
+            }
+        }
+        // let blackMouse = new Mouses('blackmouse', '3cm'); // Must call super constructor in derived class before accessing 'this'...
+        // 直接报错，说要先调用super() 才能生成this指向的对象，那么我们新建一个继承类Cats如下
+        class Cats extends Animals {
+            constructor(name, earLength) {
+                super(name);
+                this.earLength = earLength;
+            }
+        }
+        let whiteCat = new Cats('whiteCat', '5cm'); // animals constructor + whiteCat
+        console.log(whiteCat.name); // undefined
+        console.log(whiteCat.earLength); // 5cm
+
+        // 重写类字段: 一个棘手的注意要点
+        {
+            class Animal {
+                name = 'animal';
+
+                constructor() {
+                    console.log(this.name); // (*)
+                }
+            }
+
+            class Rabbit extends Animal {
+                name = 'rabbit';
+                // constructor() {
+                //     super();
+                //     console.log(this.name);
+                // }
+            }
+
+            new Animal(); // animal
+            new Rabbit(); // animal
+
+            // 这里，Rabbit 继承自 Animal，并且用它自己的值重写了 name 字段。
+            // 因为 Rabbit 中没有自己的构造器，所以 Animal 的构造器被调用了。
+            // 有趣的是在这两种情况下：new Animal() 和 new Rabbit()，在 (*) 行的 alert 都打印了 animal。
+            // 换句话说， 父类构造器总是会使用它自己字段的值，而不是被重写的那一个。
+        }
+        // 但是我们调用 this.showName() 方法而不是 this.name 字段：
+        {
+            class Animal {
+                showName() {
+                    console.log('animal');
+                }
+                constructor() {
+                    this.showName();
+                }
+            }
+
+            class Rabbit extends Animal {
+                name = 'rabbit';
+                showName() {
+                    console.log('rabbit');
+                }
+            }
+            new Animal(); // animal
+            new Rabbit(); // rabbit
+
+            // 这时的输出是不同的。
+            // 这才是我们本来所期待的结果。当父类构造器在派生的类中被调用时，它会使用被重写的方法。
+            // 但对于类字段并非如此。正如前文所述，父类构造器总是使用父类的字段。
+
+            // 原因在于字段初始化的顺序。【类字段】是这样初始化的：
+            // 对于基类（还未继承任何东西的那种），在构造函数调用前初始化。
+            // 对于派生类，在 super() 后立刻初始化。
+        }
+
+        // 深入：内部探究和 [[HomeObject]]  --------------------------------------------------太难先跳过！
+        {
+            class Animal {
+                name = 'animal';
+
+                constructor() {
+                    console.log(this.name); // (*)
+                }
+            }
+
+            class Rabbit extends Animal {
+                name = 'rabbit';
+                // constructor(...argus) {
+                //     super(...argus);
+                // }
+            }
+
+            new Animal(); // animal
+            new Rabbit(); // animal
+
+            // 对于派生类（也就是文中继承了Animal的Rabbit），类字段初始化是在super()之后
+            // 也就是在派生类执行了父类构造函数之后
+        }
+    }
+    // 练习 继承类
+    {
+        class Animal {
+
+            constructor(name) {
+                this.name = name;
+            }
+
+        }
+
+        class Rabbit extends Animal {
+            constructor(name) {
+                super(name);
+                this.created = Date.now();
+            }
+        }
+
+        let rabbit = new Rabbit("White Rabbit"); // Error: this is not defined
+        console.log(rabbit.name);
+    }
+
+    {
+        // 扩展clock 在原有定时1秒输出时间的基类上添加自定义间隔
+
+        class Clock {
+            constructor({ template }) {
+                this.template = template;
+            }
+            render() {
+                let date = new Date();
+                let hours = date.getHours();
+                if (hours < 10) hours = '0' + hours;
+                let mins = date.getMinutes();
+                if (mins < 10) mins = '0' + mins;
+                let secs = date.getSeconds();
+                if (secs < 10) secs = '0' + secs;
+                let output = this.template.replace('h', hours).replace('m', mins).replace('s', secs);
+                console.log(output);
+            }
+            start() {
+                this.render();
+                this.timer = setInterval(() => this.render(), 1000);
+            }
+        }
+        class ExtendedClock extends Clock {
+            constructor({ template, precision }) {
+                super({ template });
+                this.precision = precision ? precision : 1000;
+            }
+            start() {
+                this.render();
+                this.timer = setInterval(() => this.render(), this.precision);
+            }
+        }
+        let extclock = new ExtendedClock({template: 'h:m:s', precision: 1500});
+        // extclock.start(); // 每隔1500毫秒输出一次时间
+    }
 
 }
