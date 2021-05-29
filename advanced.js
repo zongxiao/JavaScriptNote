@@ -1647,5 +1647,21 @@
         let extclock = new ExtendedClock({template: 'h:m:s', precision: 1500});
         // extclock.start(); // 每隔1500毫秒输出一次时间
     }
+}
 
+{
+    // 静态属性和静态方法
+    console.log('-------------静态属性和静态方法------------');
+    // 我们可以把一个方法赋值给类的函数本身，而不是赋给它的 "prototype"。这样的方法被称为 静态的（static）。
+    // 在一个类中，它们以 static 关键字开头，如下所示：
+    {
+        class User {
+            static staticMethod() {
+                console.log(this === User);
+            }
+        }
+
+        User.staticMethod();
+    }
+    
 }
